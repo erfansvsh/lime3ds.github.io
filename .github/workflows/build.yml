@@ -26,6 +26,7 @@ jobs:
       run: |
         mkdir -p dist
         mkdir -p build
+        mkdir -p build/nro
 
     - name: Create C++ wrapper
       run: |
@@ -41,16 +42,14 @@ jobs:
         source emsdk/emsdk_env.sh
         emcc -O3 -s WASM=1 -s SIDE_MODULE=1 -o dist/lime3ds.so build/wrapper.cpp
 
-    - name: Install devkitPro
+    - name: Install devkitPro and libnx
       run: |
         wget https://apt.devkitpro.org/install-devkitpro-pacman
         chmod +x install-devkitpro-pacman
         echo "Y" | sudo ./install-devkitpro-pacman
         sudo dkp-pacman -Sy --noconfirm
         sudo dkp-pacman -S switch-dev --noconfirm
-
-    - name: Create build directory for .nro
-      run: mkdir -p build/nro
+        sudo dkp-pacman -S libnx --noconfirm
 
     - name: Copy JavaScript files for .nro
       run: cp resources/scripts/htmlimporter.js build/nro/
