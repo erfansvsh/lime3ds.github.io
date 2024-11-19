@@ -13,7 +13,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y wget gnupg
+        sudo apt-get install -y wget gnupg build-essential
 
     - name: Install devkitPro
       run: |
@@ -29,6 +29,20 @@ jobs:
     - name: Copy JavaScript files
       run: cp resources/scripts/htmlimporter.js build/
 
+    - name: Create C/C++ wrapper
+      run: |
+        echo '#include <emscripten.h>' > build/wrapper.cpp
+        echo 'extern "C" {' >> build/wrapper.cpp
+        echo 'void EMSCRIPTEN_KEEPALIVE run_js() {' >> build/wrapper.cpp
+        echo '  // Call your JavaScript function here' >> build/wrapper.cpp
+        echo '}' >> build/wrapper.cpp
+        echo '}' >> build/wrapper.cpp
+
+    - name: Compile to .so
+      run: |
+        source ./emsdk/emsdk_env.sh
+        emcc -O3 -s WASM=1 -s SIDE_MODULE=1 -o dist/lime3ds.so build/wrapper.cpp build/htmlimporter.js
+
     - name: Compile to .nro
       run: |
         # Add your specific commands to compile to .nro here
@@ -38,4 +52,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Lime3DS
-        path: build/
+        path: dist/
