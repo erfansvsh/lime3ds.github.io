@@ -31,7 +31,7 @@ jobs:
         make
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: lime3ds-build
         path: build/
