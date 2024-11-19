@@ -51,6 +51,9 @@ jobs:
         sudo dkp-pacman -S switch-dev --noconfirm
         sudo dkp-pacman -S libnx --noconfirm
 
+    - name: Set DEVKITPRO environment variable
+      run: echo "export DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
+
     - name: Copy JavaScript files for .nro
       run: cp resources/scripts/htmlimporter.js build/nro/
 
@@ -66,6 +69,7 @@ jobs:
 
     - name: Compile to .nro
       run: |
+        source $GITHUB_ENV
         cd build/nro
         make
 
