@@ -22,8 +22,10 @@ jobs:
         ./emsdk install latest
         ./emsdk activate latest
 
-    - name: Create dist directory
-      run: mkdir -p dist
+    - name: Create directories
+      run: |
+        mkdir -p dist
+        mkdir -p build
 
     - name: Create C++ wrapper
       run: |
@@ -46,9 +48,6 @@ jobs:
         echo "Y" | sudo ./install-devkitpro-pacman
         sudo dkp-pacman -Sy --noconfirm
         sudo dkp-pacman -S switch-dev --noconfirm
-
-    - name: Create build directory
-      run: mkdir -p build
 
     - name: Copy JavaScript files
       run: cp resources/scripts/htmlimporter.js build/
