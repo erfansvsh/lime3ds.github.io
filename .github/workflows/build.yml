@@ -49,13 +49,26 @@ jobs:
         sudo dkp-pacman -Sy --noconfirm
         sudo dkp-pacman -S switch-dev --noconfirm
 
-    - name: Copy JavaScript files
-      run: cp resources/scripts/htmlimporter.js build/
+    - name: Create build directory for .nro
+      run: mkdir -p build/nro
+
+    - name: Copy JavaScript files for .nro
+      run: cp resources/scripts/htmlimporter.js build/nro/
+
+    - name: Create Makefile for .nro
+      run: |
+        echo 'TARGET = lime3ds' > build/nro/Makefile
+        echo 'BUILD = build' >> build/nro/Makefile
+        echo 'SOURCES = .' >> build/nro/Makefile
+        echo 'INCLUDES = .' >> build/nro/Makefile
+        echo 'LIBS = -lnx' >> build/nro/Makefile
+        echo 'include $(DEVKITPRO)/libnx/switch_rules' >> build/nro/Makefile
+        echo '$(BUILD)/$(TARGET).nro: $(BUILD)/$(TARGET).elf' >> build/nro/Makefile
 
     - name: Compile to .nro
       run: |
-        # Add your specific commands to compile to .nro here
-        # Example: Use nx-hbmenu or other tools to package the JavaScript as a homebrew app
+        cd build/nro
+        make
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
