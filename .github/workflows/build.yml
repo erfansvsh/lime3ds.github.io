@@ -44,14 +44,13 @@ jobs:
 
     - name: Install devkitPro and libnx
       run: |
-        wget https://github.com/devkitPro/installer/releases/latest/download/devkitproinstaller.exe
-        chmod +x devkitproinstaller.exe
-        ./devkitproinstaller.exe --quiet --target /opt/devkitpro
-        export DEVKITPRO=/opt/devkitpro
-        export DEVKITARM=$DEVKITPRO/devkitARM
-        export DEVKITPPC=$DEVKITPRO/devkitPPC
-        export DEVKITA64=$DEVKITPRO/devkitA64
-        export PATH=$PATH:$DEVKITPRO/tools/bin
+        sudo apt-get install -y devkitpro-pacman
+        sudo dkp-pacman -Sy --noconfirm
+        sudo dkp-pacman -S switch-dev --noconfirm
+        sudo dkp-pacman -S libnx --noconfirm
+
+    - name: Set DEVKITPRO environment variable
+      run: echo "export DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
 
     - name: Copy JavaScript files for .nro
       run: cp resources/scripts/htmlimporter.js build/nro/
