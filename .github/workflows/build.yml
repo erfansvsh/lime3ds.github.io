@@ -10,17 +10,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up CMake
-      uses: lukka/get-cmake@latest
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
 
-    - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_PROCESSOR=arm64
+    - name: Install dependencies
+      run: npm install
 
     - name: Build
-      run: cmake --build build --config Release
+      run: |
+        mkdir -p dist
+        cp resources/scripts/htmlimporter.js dist/
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Lime3DS
-        path: build/
+        path: dist/
