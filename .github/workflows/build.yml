@@ -10,18 +10,28 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build
+    - name: Set up Emscripten
       run: |
-        mkdir -p dist
-        cp resources/scripts/htmlimporter.js dist/
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        ./emsdk install latest
+        ./emsdk activate latest
+        source ./emsdk_env.sh
+
+    - name: Compile to .so
+      run: |
+        source ./emsdk/emsdk_env.sh
+        emcc -O3 -s WASM=1 -s SIDE_MODULE=1 -o dist/lime3ds.so resources/scripts/htmlimporter.js
+
+    - name: Set up devkitPro
+      run: |
+        sudo dkp-pacman -S switch-dev
+
+    - name: Compile to .nro
+      run: |
+        mkdir -p build
+        cp resources/scripts/htmlimporter.js build/
+        # Add your specific commands to compile to .nro here
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
