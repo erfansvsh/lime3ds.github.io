@@ -1,0 +1,37 @@
+name: Build Lime3DS
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        platform: [arm64]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Install dependencies
+      run: sudo apt-get install -y build-essential cmake
+
+    - name: Build Lime3DS
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/arm64.cmake
+        make
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: lime3ds-build
+        path: build/
