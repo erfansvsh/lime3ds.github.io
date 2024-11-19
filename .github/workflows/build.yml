@@ -18,6 +18,9 @@ jobs:
         ./emsdk activate latest
         source ./emsdk_env.sh
 
+    - name: Create dist directory
+      run: mkdir -p dist
+
     - name: Compile to .so
       run: |
         source ./emsdk/emsdk_env.sh
