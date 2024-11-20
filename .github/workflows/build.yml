@@ -37,9 +37,9 @@ jobs:
       uses: docker://devkitpro/devkita64:latest
       with:
         args: |
-          sudo dkp-pacman -Sy --noconfirm
-          sudo dkp-pacman -S switch-dev --noconfirm
-          sudo dkp-pacman -S libnx --noconfirm
+          dkp-pacman -Sy --noconfirm
+          dkp-pacman -S switch-dev --noconfirm
+          dkp-pacman -S libnx --noconfirm
           mkdir -p build/nro
           cp resources/scripts/htmlimporter.js build/nro/
           echo 'TARGET = lime3ds' > build/nro/Makefile
