@@ -1,33 +1,26 @@
 name: Build Lime3DS
-
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y wget gnupg build-essential
-
     - name: Install Emscripten
       run: |
         git clone https://github.com/emscripten-core/emsdk.git
         cd emsdk
         ./emsdk install latest
         ./emsdk activate latest
-
     - name: Create directories
       run: |
         mkdir -p dist
         mkdir -p build
         mkdir -p build/nro
-
     - name: Create C++ wrapper
       run: |
         echo '#include <emscripten.h>' > build/wrapper.cpp
@@ -36,25 +29,22 @@ jobs:
         echo '  // Call your JavaScript function here' >> build/wrapper.cpp
         echo '}' >> build/wrapper.cpp
         echo '}' >> build/wrapper.cpp
-
     - name: Compile to .so
       run: |
         source emsdk/emsdk_env.sh
         emcc -O3 -s WASM=1 -s SIDE_MODULE=1 -o dist/lime3ds.so build/wrapper.cpp
-
     - name: Install devkitPro and libnx
       run: |
-        sudo apt-get install -y devkitpro-pacman
+        sudo apt-get install -y wget tar xz-utils
+        wget https://apt.devkitpro.org/install-devkitpro-pacman.sh
+        sudo sh install-devkitpro-pacman.sh
         sudo dkp-pacman -Sy --noconfirm
         sudo dkp-pacman -S switch-dev --noconfirm
         sudo dkp-pacman -S libnx --noconfirm
-
     - name: Set DEVKITPRO environment variable
       run: echo "export DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
-
     - name: Copy JavaScript files for .nro
       run: cp resources/scripts/htmlimporter.js build/nro/
-
     - name: Create Makefile for .nro
       run: |
         echo 'TARGET = lime3ds' > build/nro/Makefile
@@ -64,13 +54,11 @@ jobs:
         echo 'LIBS = -lnx' >> build/nro/Makefile
         echo 'include $(DEVKITPRO)/libnx/switch_rules' >> build/nro/Makefile
         echo '$(BUILD)/$(TARGET).nro: $(BUILD)/$(TARGET).elf' >> build/nro/Makefile
-
     - name: Compile to .nro
       run: |
         source $GITHUB_ENV
         cd build/nro
         make
-
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
