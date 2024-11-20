@@ -36,9 +36,8 @@ jobs:
     - name: Install devkitPro and libnx
       run: |
         sudo apt-get install -y wget tar xz-utils
-        wget https://apt.devkitpro.org/install-devkitpro-pacman.sh
-        chmod +x install-devkitpro-pacman.sh
-        sudo ./install-devkitpro-pacman.sh
+        wget https://github.com/devkitPro/pacman/releases/download/v6.0.2/devkitpro-pacman.deb
+        sudo dpkg -i devkitpro-pacman.deb
         sudo dkp-pacman -Sy --noconfirm
         sudo dkp-pacman -S switch-dev --noconfirm
         sudo dkp-pacman -S libnx --noconfirm
