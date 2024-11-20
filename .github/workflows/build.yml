@@ -46,7 +46,7 @@ jobs:
           echo 'SOURCES = .' >> build/nro/Makefile &&
           echo 'INCLUDES = .' >> build/nro/Makefile &&
           echo 'LIBS = -lnx' >> build/nro/Makefile &&
-          echo 'include $(DEVKITPRO)/libnx/switch_rules' >> build/nro/Makefile &&
+          echo 'include /opt/devkitpro/libnx/switch_rules' >> build/nro/Makefile &&
           echo '$(BUILD)/$(TARGET).nro: $(BUILD)/$(TARGET).elf' >> build/nro/Makefile &&
           cd build/nro &&
           make
@@ -56,5 +56,3 @@ jobs:
       with:
         name: Lime3DS
         path: dist/
-
-
