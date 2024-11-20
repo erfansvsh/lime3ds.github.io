@@ -33,24 +33,32 @@ jobs:
       run: |
         source emsdk/emsdk_env.sh
         emcc -O3 -s WASM=1 -s SIDE_MODULE=1 -o dist/lime3ds.so build/wrapper.cpp
-    - name: Use devkitPro Docker image
+    - name: Install devkitPro and libnx
       run: |
-        docker run --rm -v $(pwd):/workspace -w /workspace devkitpro/devkita64:latest /bin/bash -c "
-          dkp-pacman -Sy --noconfirm &&
-          dkp-pacman -S switch-dev --noconfirm &&
-          dkp-pacman -S libnx --noconfirm &&
-          mkdir -p build/nro &&
-          cp resources/scripts/htmlimporter.js build/nro/ &&
-          echo 'TARGET = lime3ds' > build/nro/Makefile &&
-          echo 'BUILD = build' >> build/nro/Makefile &&
-          echo 'SOURCES = .' >> build/nro/Makefile &&
-          echo 'INCLUDES = .' >> build/nro/Makefile &&
-          echo 'LIBS = -lnx' >> build/nro/Makefile &&
-          echo 'include $(DEVKITPRO)/libnx/switch_rules' >> build/nro/Makefile &&
-          echo '$(BUILD)/$(TARGET).nro: $(BUILD)/$(TARGET).elf' >> build/nro/Makefile &&
-          cd build/nro &&
-          make
-        "
+        sudo apt-get install -y wget tar xz-utils
+        wget https://github.com/devkitPro/pacman/releases/download/v3.0.3/devkitpro-pacman.deb
+        sudo dpkg -i devkitpro-pacman.deb
+        sudo dkp-pacman -Sy --noconfirm
+        sudo dkp-pacman -S switch-dev --noconfirm
+        sudo dkp-pacman -S libnx --noconfirm
+    - name: Set DEVKITPRO environment variable
+      run: echo "export DEVKITPRO=/opt/devkitpro" >> $GITHUB_ENV
+    - name: Copy JavaScript files for .nro
+      run: cp resources/scripts/htmlimporter.js build/nro/
+    - name: Create Makefile for .nro
+      run: |
+        echo 'TARGET = lime3ds' > build/nro/Makefile
+        echo 'BUILD = build' >> build/nro/Makefile
+        echo 'SOURCES = .' >> build/nro/Makefile
+        echo 'INCLUDES = .' >> build/nro/Makefile
+        echo 'LIBS = -lnx' >> build/nro/Makefile
+        echo 'include $(DEVKITPRO)/libnx/switch_rules' >> build/nro/Makefile
+        echo '$(BUILD)/$(TARGET).nro: $(BUILD)/$(TARGET).elf' >> build/nro/Makefile
+    - name: Compile to .nro
+      run: |
+        source $GITHUB_ENV
+        cd build/nro
+        make
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
